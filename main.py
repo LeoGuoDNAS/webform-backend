@@ -6,7 +6,7 @@ from mangum import Mangum
 from samproAPIs import clientAddressByZip
 # load_dotenv()
 # client_state = os.getenv('sampro_api_key')
-from models import create_form_model
+from models import create_form_model, Address
 # from models import FormModel
 from fastapi.middleware.cors import CORSMiddleware
 from similarity import most_similar
@@ -14,7 +14,8 @@ from strapiAPIs import getAuthToken, ticketSubmission
 from io import BytesIO
 from typing import List, Optional
 from pydantic import ValidationError
-
+from geocoding import address_validation, get_lat_lng
+import json
 
 app = FastAPI()
 handler = Mangum(app)
@@ -24,7 +25,7 @@ origins = [
     "https://leoguodnas.github.io/webform-frontend/"
 ]
 
-data = []
+# data = []
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,16 +47,10 @@ async def root():
 #     return data
 
 @app.post("/api/v1/submit")
-# async def formSubmit(
-#         data: FormModel
-#     ):
-#     authKey = getAuthToken()
-#     return await ticketSubmission(authKey, data)
-#     # return Data
 async def formSubmit(
         data: dict = Depends(create_form_model)
     ):
-    # authKey = getAuthToken()
+    authKey = (await getAuthToken())['jwt']
     # return await ticketSubmission(authKey, data)
     try:
         msg = ""
@@ -64,41 +59,49 @@ async def formSubmit(
         if (data['Images']):
             for image in data['Images']:
                 msg += image.filename + " "
+            objectReceivedMsg = {
+                "Object received" : json.dumps({k: v for k, v in data.items() if k != 'Images'}), 
+                "Images received" : f"Uploaded {len(data['Images'])} images! Here are the file names: {msg}"
+            }
+            submissionMsg, formData = await ticketSubmission(authKey, data)
+        # return objectReceivedMsg
         return {
-            "Object received" : data, 
-            "Images received" : f"Uploaded {len(data['Images'])} images! Here are the file names: {msg}"
+            "Receive Msg": objectReceivedMsg,
+            "Submission Msg": submissionMsg,
+            "FormData Submitted": formData
         }
-        # return data
-
     except ValidationError as e:
         raise HTTPException(status_code=422, detail=e.errors())
     # return data
 
+@app.post("/api/v1/validateAddress")
+async def validateAddress(address: Address):
+    response = address_validation(addressLine=address.addressLine, 
+                       city=address.city,
+                       state=address.state,
+                       zip=address.zip)
+    return response
+    
+@app.post("/api/v1/latlng/")
+async def geocde(address: Address):
+    response = get_lat_lng(addressLine=address.addressLine,
+                           city=address.city,
+                           state=address.state,
+                           zip=address.zip)
+    return response
+# @app.get("/api/v1/image/")
+# async def image():
+#     global data
+#     return StreamingResponse(io.BytesIO(data[0]), media_type="image/jpeg")
 
-# @app.get("/api/v1/signin/")
-# async def sign_in():
-#     return await getAuthToken()
-@app.get("/api/v1/image/")
-async def image():
-    global data
-    return StreamingResponse(io.BytesIO(data[0]), media_type="image/jpeg")
-
-@app.post("/api/v1/imageUpload")
-async def uploadImage(Images: Optional[List[UploadFile]]):
-    # if (Images):
-    #     # i = 0 
-    #     # for image in Images:
-    #     #     i += 1
-
-    # data = await Images[0].read()
-    # return StreamingResponse(data, media_type="image/jpeg")
-        # return i
-    msg = ""
-    global data
-    data = []
-    if (Images):
-        for image in Images:
-            msg += image.filename + " "
-            data.append(await image.read())
-    return f"Uploaded {len(Images)} images! Here are the file names: {msg}"
+# @app.post("/api/v1/imageUpload")
+# async def uploadImage(Images: Optional[List[UploadFile]]):
+#     msg = ""
+#     global data
+#     data = []
+#     if (Images):
+#         for image in Images:
+#             msg += image.filename + " "
+#             data.append(await image.read())
+#     return f"Uploaded {len(Images)} images! Here are the file names: {msg}"
 

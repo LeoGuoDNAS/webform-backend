@@ -2,6 +2,9 @@ import requests
 import os
 from dotenv import load_dotenv
 from typing import List
+from math import radians, sin, cos, sqrt, atan2
+from samproAPIs import clientAddressByZip
+from models import kitchen, hvac, ref, plumb
 
 load_dotenv()
 gcp_key = os.getenv('gcp_maps_key')
@@ -52,6 +55,29 @@ def get_lat_lng(addressLine: List[str], city, state, zip):
         return latitude, longitude
     else:
         return None, None
+    
+# returns haversine distance of two sets of coords in km
+def haversine_distance(coord1, coord2):
+    R = 6371  # Radius of Earth in kilometers
+
+    lat1, lon1 = coord1
+    lat2, lon2 = coord2
+
+    # if lat1 is None or lon1 is None or lat2 is None or lon2 is None:
+    #     return None
+
+    # Convert latitude and longitude from degrees to radians
+    rLat1, rLon1, rLat2, rLon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+    # Haversine formula
+    dLat = rLat2 - rLat1
+    dLon = rLon2 - rLon1
+
+    a = sin(dLat / 2)**2 + cos(rLat1) * cos(rLat2) * sin(dLon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    distance = R * c  # Distance in kilometers
+    return distance
 
 # Example Usage
 # API_KEY = gcp_key
@@ -69,3 +95,71 @@ def get_lat_lng(addressLine: List[str], city, state, zip):
 # zip = input("Enter an zip: ")
 # validation = address_validation(API_KEY, addressLine=[street], city=city, state=state, zip=zip)
 # print(validation)
+
+def siteMatchingViaLatLng(
+        formLat, 
+        formLng, 
+        site, 
+        possibleSites,
+        equipmentName, 
+        equipmentId, 
+        equipmentRn, 
+        siteId, 
+        siteRn,
+        minDist
+):
+    # equipmentName, equipmentId, equipmentRn, siteId, siteRn = "", "", "", "", ""
+    siteLat, siteLng = get_lat_lng(
+        addressLine=[site['clntste_addrss_shp_addrss_strt']], 
+        city=site['clntste_addrss_shp_addrss_cty'], 
+        state=site['clntste_addrss_shp_addrss_stte'],
+        zip=site['clntste_addrss_shp_addrss_zp']
+    )
+    if siteLat != None and siteLng != None:
+        dist = haversine_distance([formLat, formLng], [siteLat, siteLng])
+
+        if dist <= 5:
+            possibleSites.append([site['clntste_nme'], site['clntste_id'], siteLat, siteLng, formLat, formLng])
+            if dist <= 1 and dist < minDist:
+                minDist = dist
+                equipmentName = site['clntsteeqpmnt_nme']
+                equipmentId = site['clntsteeqpmnt_id']
+                equipmentRn = site['clntsteeqpmnt_rn']
+                siteId = site['clntste_id']
+                siteRn = site['clntste_rn']
+    return equipmentName, equipmentId, equipmentRn, siteId, siteRn, possibleSites, minDist
+    
+
+async def matchSiteToClientAddress(submittedData: dict):
+    sites: dict = await clientAddressByZip(submittedData['Zip'])
+
+    minDist = 1000
+    equipmentName, equipmentId, equipmentRn, siteId, siteRn = "", "", "", "", ""
+    possibleSites = []
+    # for site in sites:
+    #     possibleSites.append([site['clntste_nme'], site['clntste_id']])
+
+    # Filter by distance (<=1km)
+    formLat, formLng = get_lat_lng(
+        addressLine=[submittedData['Street_1']], 
+        city=submittedData['City'], 
+        state=submittedData['State'],
+        zip=submittedData['Zip']
+    )
+    for site in sites:
+        # is hvac
+        if submittedData['Type'] == "HVAC" and site['clntsteeqpmnt_nme'] in hvac:
+            equipmentName, equipmentId, equipmentRn, siteId, siteRn, possibleSites, minDist = siteMatchingViaLatLng(formLat, formLng, site, possibleSites, equipmentName, equipmentId, equipmentRn, siteId, siteRn, minDist)
+    # if 
+        elif submittedData['Type'] == "Refrigeration" and site['clntsteeqpmnt_nme'] in ref:
+            equipmentName, equipmentId, equipmentRn, siteId, siteRn, possibleSites, minDist = siteMatchingViaLatLng(formLat, formLng, site, possibleSites, equipmentName, equipmentId, equipmentRn, siteId, siteRn, minDist)
+            
+        elif submittedData['Type'] == "Kitchen" and site['clntsteeqpmnt_nme'] in kitchen:
+            equipmentName, equipmentId, equipmentRn, siteId, siteRn, possibleSites, minDist = siteMatchingViaLatLng(formLat, formLng, site, possibleSites, equipmentName, equipmentId, equipmentRn, siteId, siteRn, minDist)
+            
+        elif submittedData['Type'] == "Plumbing" and site['clntsteeqpmnt_nme'] in plumb:
+            equipmentName, equipmentId, equipmentRn, siteId, siteRn, possibleSites, minDist = siteMatchingViaLatLng(formLat, formLng, site, possibleSites, equipmentName, equipmentId, equipmentRn, siteId, siteRn, minDist)
+
+            
+    return equipmentName, equipmentId, equipmentRn, siteId, siteRn, possibleSites
+    # return equipmentName, equipmentId, equipmentRn, siteId, siteRn, possibleSites

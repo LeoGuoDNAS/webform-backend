@@ -142,7 +142,9 @@ def create_form_model(
     Type: str = Form(...),
     Description: str = Form(...),
     Preferred_Date: str = Form(...),
-    Preferred_Time: str = Form(...),
+    # Preferred_Time: str = Form(...),
+    Preferred_Start_Time: str = Form(...),
+    Preferred_End_Time: str = Form(...),
     OT_Approved: str = Form(...),
     Comments: Optional[str] = Form(""),
     Images: Optional[List[UploadFile]] = File(None)
@@ -175,10 +177,34 @@ def create_form_model(
         "Type": Type,
         "Description": Description,
         "Preferred_Date": Preferred_Date,
-        "Preferred_Time": Preferred_Time,
+        # "Preferred_Time": Preferred_Time,
+        "Preferred_Start_Time": Preferred_Start_Time,
+        "Preferred_End_Time": Preferred_End_Time,
         "OT_Approved": OT_Approved,
         "Comments": Comments,
         "Images": Images
         # Uncomment for images
         # "Images": Images
     }
+
+
+
+kitchen = {
+    "1-KITCHEN SERVICE",
+    "1Kitchen Service",
+    "Kitchen Service"
+}
+
+hvac = {
+    "HVAC Service"
+}
+
+ref = {
+    "REFRIGERATIOIN SERVICE",
+    "Refrigeration Service"
+}
+
+plumb = {
+    "PLUMB SERVICE",
+    "Plumbing Service"
+}

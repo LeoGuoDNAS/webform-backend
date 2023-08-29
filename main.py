@@ -38,13 +38,14 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {
-        "Hello": "mundo"
+        "Hello": "mundo", 
+        "Go to": "/docs for api documentation"
     }
 
-# @app.get("/api/v1/clientAddressByZip/{zip}")
-# async def client_address_by_zip(zip: int):
-#     data = await clientAddressByZip(zip)
-#     return data
+@app.get("/api/v1/clientAddressByZip/{zip}")
+async def client_address_by_zip(zip: int):
+    data = await clientAddressByZip(zip)
+    return data
 
 @app.post("/api/v1/submit")
 async def formSubmit(
@@ -53,22 +54,29 @@ async def formSubmit(
     authKey = (await getAuthToken())['jwt']
     # return await ticketSubmission(authKey, data)
     try:
-        msg = ""
+        # msg = ""
         # global data
         # data = []
         if (data['Images']):
+            msg = ""
             for image in data['Images']:
                 msg += image.filename + " "
             objectReceivedMsg = {
                 "Object received" : json.dumps({k: v for k, v in data.items() if k != 'Images'}), 
                 "Images received" : f"Uploaded {len(data['Images'])} images! Here are the file names: {msg}"
             }
-            submissionMsg, formData = await ticketSubmission(authKey, data)
+        else:
+            objectReceivedMsg = {
+                "Object received" : json.dumps({k: v for k, v in data.items() if k != 'Images'}), 
+                "Images received" : "None"
+            }
+        submissionMsg, formData = await ticketSubmission(authKey, data)
+        
         # return objectReceivedMsg
         return {
-            "Receive Msg": objectReceivedMsg,
+            "Image Receive Msg": objectReceivedMsg,
             "Submission Msg": submissionMsg,
-            "FormData Submitted": formData
+            "Formatted FormData": formData
         }
     except ValidationError as e:
         raise HTTPException(status_code=422, detail=e.errors())

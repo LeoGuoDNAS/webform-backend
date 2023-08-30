@@ -58,15 +58,16 @@ async def ticketSubmission(authToken: str, submittedData: dict):
     formattedData['AdditionalNotes'] = submittedData['Comments']
     formattedData['ClientPO'] = submittedData['Purchase_Order_Number']
     # formattedData['EquipmentName'] = "TEST 11 18 2022 0234PM" # TODO
-    formattedData['EquipmentName'] = equipmentName
-    formattedData['EquipmentID'] = equipmentId
     # formattedData['EquipmentID'] = "TEST 11 18 2022 0234PM" # TODO
     # formattedData['EquipmentRN'] = "279276402"# TODO
+    # formattedData['SiteID'] = "216742"# TODO
+    # formattedData['SiteRN'] = "220782573"# TODO
+    formattedData['EquipmentName'] = equipmentName
+    formattedData['EquipmentID'] = equipmentId
     formattedData['EquipmentRN'] = equipmentRn
     formattedData['SiteID'] = siteId
     formattedData['SiteRN'] = siteRn
-    # formattedData['SiteID'] = "216742"# TODO
-    # formattedData['SiteRN'] = "220782573"# TODO
+    
     formattedData['EquipmentServiced'] = True if submittedData['Recently_Serviced'] == "Yes" else False
     formattedData['EquipmentLocation'] = submittedData['Location']
     formattedData['Make'] = submittedData['Manufacturer']
@@ -106,33 +107,32 @@ async def ticketSubmission(authToken: str, submittedData: dict):
 
 
 
+    # check if there is match
+    if equipmentName != "" and equipmentId != "" and equipmentRn != "" and siteId != "" and siteRn != "":
+        # Post to strapi (for production)
+        file_contents = [(f.filename, await f.read(), f.content_type) for f in images]
+        for f in images:
+            await f.close()
 
-
-
-
-
-
-
-    # Post to strapi (for production)
-    # file_contents = [(f.filename, await f.read(), f.content_type) for f in images]
-    # for f in images:
-    #     await f.close()
-
-    # if len(file_contents) != 0:
-    #     response = requests.post("https://api.daynitetools.com/api/results", 
-    #                             data=formData,
-    #                             #  files={"EquipmentImage" : [(filename, content, "image/jpeg") for filename, content, type in file_contents]},
-    #                             #  files=[("EquipmentImage", f) for f in images], 
-    #                             files=[("files.EquipmentImage", (filename, content, f"image/{type}")) for filename, content, type in file_contents],
-    #                             #  files=[("files.EquipmentImage", content) for content in file_contents],
-    #                             headers=headers)
-    # else:
-    #     response = requests.post("https://api.daynitetools.com/api/results", 
-    #                             json={"data": formattedData},
-    #                             headers=headers
-    #     )
-    # return response.json(), formData
+        if len(file_contents) != 0:
+            response = requests.post("https://api.daynitetools.com/api/results", 
+                                    data=formData,
+                                    #  files={"EquipmentImage" : [(filename, content, "image/jpeg") for filename, content, type in file_contents]},
+                                    #  files=[("EquipmentImage", f) for f in images], 
+                                    files=[("files.EquipmentImage", (filename, content, f"image/{type}")) for filename, content, type in file_contents],
+                                    #  files=[("files.EquipmentImage", content) for content in file_contents],
+                                    headers=headers)
+        else:
+            response = requests.post("https://api.daynitetools.com/api/results", 
+                                    json={"data": formattedData},
+                                    headers=headers
+            )
+        return response.json(), formData
+    else: # no match
+        # send email to ...
+        
+        return {"submitFailed": "noMatch"}, formData
 
     # for testing
-    return {"testing": "testing"}, formattedData
+    # return {"testing": "testing"}, formattedData
     

@@ -22,7 +22,7 @@ handler = Mangum(app)
 
 origins = [
     "http://localhost:3000",
-    "https://leoguodnas.github.io/webform-frontend/"
+    "https://leoguodnas.github.io"
 ]
 
 # data = []
@@ -90,7 +90,7 @@ async def validateAddress(address: Address):
                        zip=address.zip)
     return response
     
-@app.post("/api/v1/latlng/")
+@app.post("/api/v1/latlng")
 async def geocde(address: Address):
     response = get_lat_lng(addressLine=address.addressLine,
                            city=address.city,

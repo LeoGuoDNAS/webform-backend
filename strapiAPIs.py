@@ -9,6 +9,8 @@ from fastapi import UploadFile
 import copy
 from datetime import datetime
 from geocoding import get_lat_lng, address_validation, haversine_distance, matchSiteToClientAddress
+from auth import acquire_access_token_without_user
+from emails import sendMessage
 
 load_dotenv()
 username = os.getenv('strapi_username')
@@ -130,8 +132,9 @@ async def ticketSubmission(authToken: str, submittedData: dict):
         return response.json(), formData
     else: # no match
         # send email to ...
-        
-        return {"submitFailed": "noMatch"}, formData
+        responseContent = await sendMessage(formattedData)
+
+        return {"submitFailed-sentEmail": responseContent}, formData
 
     # for testing
     # return {"testing": "testing"}, formattedData

@@ -59,16 +59,16 @@ async def ticketSubmission(authToken: str, submittedData: dict):
     formattedData['AccessDate'] = submittedData['Preferred_Date']
     formattedData['AdditionalNotes'] = submittedData['Comments']
     formattedData['ClientPO'] = submittedData['Purchase_Order_Number']
-    formattedData['EquipmentName'] = "TEST 11 18 2022 0234PM" # TODO
-    formattedData['EquipmentID'] = "TEST 11 18 2022 0234PM" # TODO
-    formattedData['EquipmentRN'] = "279276402"# TODO
-    formattedData['SiteID'] = "216742"# TODO
-    formattedData['SiteRN'] = "220782573"# TODO
-    # formattedData['EquipmentName'] = equipmentName
-    # formattedData['EquipmentID'] = equipmentId
-    # formattedData['EquipmentRN'] = equipmentRn
-    # formattedData['SiteID'] = siteId
-    # formattedData['SiteRN'] = siteRn
+    # formattedData['EquipmentName'] = "TEST 11 18 2022 0234PM" # TODO
+    # formattedData['EquipmentID'] = "TEST 11 18 2022 0234PM" # TODO
+    # formattedData['EquipmentRN'] = "279276402"# TODO
+    # formattedData['SiteID'] = "216742"# TODO
+    # formattedData['SiteRN'] = "220782573"# TODO
+    formattedData['EquipmentName'] = equipmentName
+    formattedData['EquipmentID'] = equipmentId
+    formattedData['EquipmentRN'] = equipmentRn
+    formattedData['SiteID'] = siteId
+    formattedData['SiteRN'] = siteRn
     
     formattedData['EquipmentServiced'] = True if submittedData['Recently_Serviced'] == "Yes" else False
     formattedData['EquipmentLocation'] = submittedData['Location']
@@ -113,15 +113,18 @@ async def ticketSubmission(authToken: str, submittedData: dict):
     if equipmentName != "" and equipmentId != "" and equipmentRn != "" and siteId != "" and siteRn != "":
         # Post to strapi (for production)
         file_contents = [(f.filename, await f.read(), f.content_type) for f in images]
+        # file_tuples = [(filename, content, type) for filename, content, type in file_contents]
+
         for f in images:
             await f.close()
 
         if len(file_contents) != 0:
             response = requests.post("https://api.daynitetools.com/api/results", 
-                                    data=formData,
+                                    data={"data": json.dumps(formattedData)},
                                     #  files={"EquipmentImage" : [(filename, content, "image/jpeg") for filename, content, type in file_contents]},
                                     #  files=[("EquipmentImage", f) for f in images], 
-                                    files=[("files.EquipmentImage", (filename, content, f"image/{type}")) for filename, content, type in file_contents],
+                                    files=[("files.EquipmentImage", file) for file in file_contents],
+                                    # files=[("files.EquipmentImage", (filename, content, f"image/{type}")) for filename, content, type in file_contents],
                                     #  files=[("files.EquipmentImage", content) for content in file_contents],
                                     headers=headers)
         else:

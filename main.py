@@ -21,8 +21,9 @@ app = FastAPI()
 handler = Mangum(app)
 
 origins = [
-    "http://localhost:3000",
-    "https://leoguodnas.github.io"
+    "*"
+    # "http://localhost:3000",
+    # "https://leoguodnas.github.io"
 ]
 
 # data = []

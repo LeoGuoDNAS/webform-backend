@@ -5,6 +5,7 @@ from typing import List
 from math import radians, sin, cos, sqrt, atan2
 from samproAPIs import clientAddressByZip
 from models import kitchen, hvac, ref, plumb
+import json
 
 load_dotenv()
 gcp_key = os.getenv('gcp_maps_key')
@@ -119,7 +120,7 @@ def siteMatchingViaLatLng(
         dist = haversine_distance([formLat, formLng], [siteLat, siteLng])
 
         if dist <= 5:
-            possibleSites.append([site['clntste_nme'], site['clntste_id'], siteLat, siteLng, formLat, formLng])
+            possibleSites.append([site['clntste_nme'], site['clntste_id']])
             if dist <= 1 and dist < minDist:
                 minDist = dist
                 equipmentName = site['clntsteeqpmnt_nme']
@@ -159,7 +160,6 @@ async def matchSiteToClientAddress(submittedData: dict):
             
         elif submittedData['Type'] == "Plumbing" and site['clntsteeqpmnt_nme'] in plumb:
             equipmentName, equipmentId, equipmentRn, siteId, siteRn, possibleSites, minDist = siteMatchingViaLatLng(formLat, formLng, site, possibleSites, equipmentName, equipmentId, equipmentRn, siteId, siteRn, minDist)
-
-            
-    return equipmentName, equipmentId, equipmentRn, siteId, siteRn, possibleSites
+     
+    return equipmentName, equipmentId, equipmentRn, siteId, siteRn, json.dumps(possibleSites)
     # return equipmentName, equipmentId, equipmentRn, siteId, siteRn, possibleSites

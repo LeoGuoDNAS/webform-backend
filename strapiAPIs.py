@@ -57,16 +57,16 @@ async def ticketSubmission(authToken: str, submittedData: dict):
     formattedData['AccessDate'] = submittedData['Preferred_Date']
     formattedData['AdditionalNotes'] = submittedData['Comments']
     formattedData['ClientPO'] = submittedData['Purchase_Order_Number']
-    # formattedData['EquipmentName'] = "TEST 11 18 2022 0234PM" # TODO
-    # formattedData['EquipmentID'] = "TEST 11 18 2022 0234PM" # TODO
-    # formattedData['EquipmentRN'] = "279276402"# TODO
-    # formattedData['SiteID'] = "216742"# TODO
-    # formattedData['SiteRN'] = "220782573"# TODO
-    formattedData['EquipmentName'] = equipmentName
-    formattedData['EquipmentID'] = equipmentId
-    formattedData['EquipmentRN'] = equipmentRn
-    formattedData['SiteID'] = siteId
-    formattedData['SiteRN'] = siteRn
+    formattedData['EquipmentName'] = "TEST 11 18 2022 0234PM" # TODO
+    formattedData['EquipmentID'] = "TEST 11 18 2022 0234PM" # TODO
+    formattedData['EquipmentRN'] = "279276402"# TODO
+    formattedData['SiteID'] = "216742"# TODO
+    formattedData['SiteRN'] = "220782573"# TODO
+    # formattedData['EquipmentName'] = equipmentName
+    # formattedData['EquipmentID'] = equipmentId
+    # formattedData['EquipmentRN'] = equipmentRn
+    # formattedData['SiteID'] = siteId
+    # formattedData['SiteRN'] = siteRn
     
     formattedData['EquipmentServiced'] = True if submittedData['Recently_Serviced'] == "Yes" else False
     formattedData['EquipmentLocation'] = submittedData['Location']

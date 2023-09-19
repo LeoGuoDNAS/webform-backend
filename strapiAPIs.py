@@ -219,58 +219,59 @@ async def ticketSubmission(authToken: str, submittedData: dict):
 
         # send to weblog with Unknown siteID and siteRn
         # TODO: Unknown siteID and siteRn
-        response = requests.post("https://sampro.wearetheone.com/FMMSService/WeblogAPI", 
-                                json={
-                                    "caller": f"{submittedData['First_Name'] + ' ' + submittedData['Last_Name']} (Web Form)",
-                                    "phoneNumder": submittedData['Phone_Number'],
-                                    "siteId": str(siteId),
-                                    "street1": submittedData['Street_1'],
-                                    "street2": submittedData['Street_2'],
-                                    "city": submittedData['City'],
-                                    "state": submittedData['State'],
-                                    "zip": submittedData['Zip'],
-                                    "problemDescription": submittedData['Description'],
-                                    "notToExceed": "999999",
-                                    "siteRN": int(siteRn),
-                                    "equipmentRN": int(equipmentRn),
-                                    "workRequested": formattedData['ProblemDescription'] + ":Work requested (From Webform: Equipment Qr Code Number:"
-                                                    + " -- Equip Serviced in Last 30 Days:" + formattedData['EquipmentServiced']
-                                                    + " -- PO Required:" + formattedData['PORequired']
-                                                    + " -- Client PO:" + formattedData['ClientPO']
-                                                    + " -- Equip Access Start Time:" + formattedData['EquipAccessStart']
-                                                    + " -- Equip Access End Time:" + formattedData['EquipAccessEnd']
-                                                    + " -- Equip Access Date:" + formattedData['AccessDate']
-                                                    + " -- Point of Contact Name:" + formattedData['POCName'] 
-                                                    + " -- POC Email:" + formattedData['POCEmail'] 
-                                                    + " -- Diagnosis Images:"
-                                                    + " -- Poc Phone:" + formattedData['POCPhoneNumber']
-                                                    + " -- Poc Phone Ext:" + formattedData['POCPhoneNumberExt']
-                                                    + " -- Poc Phone Two:" + formattedData['POCPhoneTwo']
-                                                    + " -- Poc Phone Two Ext:" + formattedData['POCPhoneTwoExt']
-                                                    + " -- Street 1:" + formattedData['StreetOne']
-                                                    + " -- Street 2:" + formattedData['StreetTwo']
-                                                    + " -- Street 3:" + formattedData['StreetThree']
-                                                    + " -- Street 4:" + formattedData['StreetFour']
-                                                    + " -- City:" + formattedData['City']
-                                                    + " -- State:" + formattedData['State']
-                                                    + " -- Zip:" + formattedData['Zip']
-                                                    + " -- Possible Sites:" + formattedData['PossibleSites']
-                                                    + " -- Additional Notes:" + formattedData['AdditionalNotes']
-                                                    + " -- ClientSite ID:" + formattedData['SiteID']
-                                                    + " -- EquipmentID:" + formattedData['EquipmentID']
-                                                    + " -- Under Warranty?:" + formattedData['UnderWarranty']
-                                                    + " -- Equipment Type:" + formattedData['EquipmentType']
-                                                    + " -- Equipment Serial Number:" + formattedData['SerialNumber']
-                                                    + " -- Equipment Make:" + formattedData['Make']
-                                                    + " -- Equipment Model:" + formattedData['Model']
-                                                    + " -- EquipmentFloor#/location:" + formattedData['EquipmentLocation']
-                                                    + " -- Equipment Name:" + formattedData['EquipmentName']
-                                                    + " -- UserID:webform",
-                                    "requestDate": submittedData['Preferred_Date'],
-                                    "poNumber": submittedData['Purchase_Order_Number'],
-                                    "submittedBy": "Web form"
-                                }
-        )
+        
+        # response = requests.post("https://sampro.wearetheone.com/FMMSService/WeblogAPI", 
+        #                         json={
+        #                             "caller": f"{submittedData['First_Name'] + ' ' + submittedData['Last_Name']} (Web Form)",
+        #                             "phoneNumder": submittedData['Phone_Number'],
+        #                             "siteId": str(siteId),
+        #                             "street1": submittedData['Street_1'],
+        #                             "street2": submittedData['Street_2'],
+        #                             "city": submittedData['City'],
+        #                             "state": submittedData['State'],
+        #                             "zip": submittedData['Zip'],
+        #                             "problemDescription": submittedData['Description'],
+        #                             "notToExceed": "999999",
+        #                             "siteRN": int(siteRn),
+        #                             "equipmentRN": int(equipmentRn),
+        #                             "workRequested": formattedData['ProblemDescription'] + ":Work requested (From Webform: Equipment Qr Code Number:"
+        #                                             + " -- Equip Serviced in Last 30 Days:" + formattedData['EquipmentServiced']
+        #                                             + " -- PO Required:" + formattedData['PORequired']
+        #                                             + " -- Client PO:" + formattedData['ClientPO']
+        #                                             + " -- Equip Access Start Time:" + formattedData['EquipAccessStart']
+        #                                             + " -- Equip Access End Time:" + formattedData['EquipAccessEnd']
+        #                                             + " -- Equip Access Date:" + formattedData['AccessDate']
+        #                                             + " -- Point of Contact Name:" + formattedData['POCName'] 
+        #                                             + " -- POC Email:" + formattedData['POCEmail'] 
+        #                                             + " -- Diagnosis Images:"
+        #                                             + " -- Poc Phone:" + formattedData['POCPhoneNumber']
+        #                                             + " -- Poc Phone Ext:" + formattedData['POCPhoneNumberExt']
+        #                                             + " -- Poc Phone Two:" + formattedData['POCPhoneTwo']
+        #                                             + " -- Poc Phone Two Ext:" + formattedData['POCPhoneTwoExt']
+        #                                             + " -- Street 1:" + formattedData['StreetOne']
+        #                                             + " -- Street 2:" + formattedData['StreetTwo']
+        #                                             + " -- Street 3:" + formattedData['StreetThree']
+        #                                             + " -- Street 4:" + formattedData['StreetFour']
+        #                                             + " -- City:" + formattedData['City']
+        #                                             + " -- State:" + formattedData['State']
+        #                                             + " -- Zip:" + formattedData['Zip']
+        #                                             + " -- Possible Sites:" + formattedData['PossibleSites']
+        #                                             + " -- Additional Notes:" + formattedData['AdditionalNotes']
+        #                                             + " -- ClientSite ID:" + formattedData['SiteID']
+        #                                             + " -- EquipmentID:" + formattedData['EquipmentID']
+        #                                             + " -- Under Warranty?:" + formattedData['UnderWarranty']
+        #                                             + " -- Equipment Type:" + formattedData['EquipmentType']
+        #                                             + " -- Equipment Serial Number:" + formattedData['SerialNumber']
+        #                                             + " -- Equipment Make:" + formattedData['Make']
+        #                                             + " -- Equipment Model:" + formattedData['Model']
+        #                                             + " -- EquipmentFloor#/location:" + formattedData['EquipmentLocation']
+        #                                             + " -- Equipment Name:" + formattedData['EquipmentName']
+        #                                             + " -- UserID:webform",
+        #                             "requestDate": submittedData['Preferred_Date'],
+        #                             "poNumber": submittedData['Purchase_Order_Number'],
+        #                             "submittedBy": "Web form"
+        #                         }
+        # )
 
         return {"submitFailed-sentEmail": responseContent}, formattedData
 

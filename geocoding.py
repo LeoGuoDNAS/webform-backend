@@ -120,7 +120,8 @@ def siteMatchingViaLatLng(
         dist = haversine_distance([formLat, formLng], [siteLat, siteLng])
 
         if dist <= 5:
-            possibleSites.append([site['clntste_nme'], site['clntste_id']])
+            # possibleSites.append([site['clntste_nme'], site['clntste_id']])
+            possibleSites.append(site['clntste_id'])
             if dist <= 1 and dist < minDist:
                 minDist = dist
                 equipmentName = site['clntsteeqpmnt_nme']

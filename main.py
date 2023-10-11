@@ -3,14 +3,14 @@ from fastapi.responses import JSONResponse, StreamingResponse
 # from dotenv import load_dotenv
 import io
 from mangum import Mangum
-from samproAPIs import clientAddressByZip
+from samproAPIs import clientAddressByZip, clientAddressByZipUnique, clientAddressPlaceholder
 # load_dotenv()
 # client_state = os.getenv('sampro_api_key')
-from models import create_form_model, Address
+from models import create_form_model, Address, SiteInfo
 # from models import FormModel
 from fastapi.middleware.cors import CORSMiddleware
 from similarity import most_similar
-from strapiAPIs import getAuthToken, ticketSubmission
+from strapiAPIs import getAuthToken, ticketSubmission, getSiteInfo
 from io import BytesIO
 from typing import List, Optional
 from pydantic import ValidationError
@@ -47,6 +47,22 @@ async def root():
 async def client_address_by_zip(zip: int):
     data = await clientAddressByZip(zip)
     return data
+
+@app.get("/api/v1/clientAddressByZipUnique/{zip}")
+async def client_address_by_zip(zip: int):
+    data = await clientAddressByZipUnique(zip)
+    return data
+
+@app.get("/api/v1/clientAddressPlaceholder")
+async def client_address_placeholder():
+    data = await clientAddressPlaceholder()
+    return data
+
+@app.post("/api/v1/getSiteInfo")
+async def get_site_info(info: SiteInfo):
+    # data = await clientAddressByZip(info)
+    # return data
+    return await getSiteInfo(info)
 
 @app.post("/api/v1/submit")
 async def formSubmit(

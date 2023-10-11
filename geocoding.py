@@ -133,9 +133,9 @@ def siteMatchingViaLatLng(
     
 
 async def matchSiteToClientAddress(submittedData: dict):
-    sites: dict = await clientAddressByZip(submittedData['Zip'])
+    sites = await clientAddressByZip(submittedData['Zip'])
 
-    minDist = 1000
+    minDist = 100
     equipmentName, equipmentId, equipmentRn, siteId, siteRn = "", "", "", "", ""
     possibleSites = []
     # for site in sites:

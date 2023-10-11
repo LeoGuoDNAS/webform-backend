@@ -15,6 +15,17 @@ class Address(BaseModel):
     state: str
     zip: str
 
+class SiteInfo(BaseModel):
+    businessName: str
+    street1: str
+    city: str
+    state: str
+    zip: str
+    email: str
+    phone: str
+    emails: List[str]
+    phoneNumbers: List[str]
+
 # class YesOrNo(Enum):
 #     EMPTY = "-"
 #     YES = "Yes"
@@ -109,7 +120,7 @@ class FormModel:
     POCPhoneTwo: Optional[str]
     POCPhoneTwoExt: Optional[str]
     OTApproved: Optional[bool]
-    PossibleSites: Optional[str]
+    # PossibleSites: Optional[str]
     POCPhoneNumberExt: Optional[str]
 
         
@@ -117,6 +128,7 @@ class FormModel:
 
 
 def create_form_model(
+    Business_Name: str = Form(...),
     Street_1: str = Form(...),
     Street_2: Optional[str] = Form(""),
     Street_3: Optional[str] = Form(""),
@@ -139,7 +151,14 @@ def create_form_model(
     Require_PO_number: str = Form(...),
     Purchase_Order_Number: Optional[str] = Form(""),
     Location: str = Form(...),
-    Type: str = Form(...),
+    # Type: str = Form(...),
+    Equipment_RN: str = Form(...),
+    Equipment_Name: str = Form(...),
+    Equipment_ID: str = Form(...),
+    Site_ID: str = Form(...),
+    Site_RN: str = Form(...),
+    # Possible_Sites: List[str] = Form(...),
+
     Description: str = Form(...),
     Preferred_Date: str = Form(...),
     # Preferred_Time: str = Form(...),
@@ -174,7 +193,13 @@ def create_form_model(
         "Require_PO_number": Require_PO_number,
         "Purchase_Order_Number": Purchase_Order_Number,
         "Location": Location,
-        "Type": Type,
+        # "Type": Type,
+        "Equipment_RN": Equipment_RN,
+        "Equipment_Name": Equipment_Name,
+        "Equipment_ID": Equipment_ID,
+        "Site_ID": Site_ID,
+        "Site_RN": Site_RN,
+
         "Description": Description,
         "Preferred_Date": Preferred_Date,
         # "Preferred_Time": Preferred_Time,

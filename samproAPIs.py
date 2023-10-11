@@ -23,10 +23,62 @@ async def clientAddressByZip(zip: int):
         json=data
     )
     text = response.text
-    if text.startswith('"') and text.endswith('"'):
-        text = text[1:-1]
+    # if text.startswith('"') and text.endswith('"'):
+    #     text = text[1:-1]
+        
+    # text = text.replace('\\"', '"')
 
-    text = text.replace('\\"', '"')
+    # data = json.loads(text)
+    # return data
+    return json.loads(json.loads(text))
 
-    data = json.loads(text)
-    return data
+async def clientAddressByZipUnique(zip: int):
+    headers = {
+        'Authorization': f'api_key {sampro_api_key}',
+        'Content-Type': 'application/json'    
+    }
+
+    data = {
+        'tokenList': [['@zip@', zip, zip, 'variable']],
+        'queryName': 'ClientSiteAddressByZipUnique'
+    }
+
+    response = requests.post(
+        'https://sampro.wearetheone.com/DBAnalytics/SAMProAPI.svc/postKPIData', 
+        headers=headers, 
+        json=data
+    )
+    text = response.text
+    # if text.startswith('"') and text.endswith('"'):
+    #     text = text[1:-1]
+
+    # text = text.replace('\\"', '"')
+
+    # data = json.loads(text)
+    # return data
+    
+    dataFromText = json.loads(json.loads(text))
+    # print(type(dataFromText))
+
+    # return json.loads(text)
+    return dataFromText
+
+async def clientAddressPlaceholder():
+    headers = {
+        'Authorization': f'api_key {sampro_api_key}',
+        'Content-Type': 'application/json'    
+    }
+
+    data = {
+        'tokenList': [],
+        'queryName': 'ClientSiteAddressPlaceholder'
+    }
+
+    response = requests.post(
+        'https://sampro.wearetheone.com/DBAnalytics/SAMProAPI.svc/postKPIData', 
+        headers=headers, 
+        json=data
+    )
+    text = response.text
+    dataFromText = json.loads(json.loads(text))
+    return dataFromText

@@ -14,6 +14,7 @@ from geocoding import get_lat_lng, address_validation, haversine_distance, match
 from auth import acquire_access_token_without_user
 from emails import sendMessage
 from difflib import SequenceMatcher
+from Levenshtein import distance
 
 similarity_threshold = 0.8
 
@@ -45,6 +46,8 @@ async def getSiteInfo(info: SiteInfo):
     sitesByZip = await clientAddressByZipUnique(info.zip)
     sitesByZipNameEmailPhone = []
     sitesByZipNameEmailPhoneDist = []
+    possibleSites = []
+    possibleSitesDist = []
     formLat, formLng = get_lat_lng(
         addressLine=[info.street1], 
         city=info.city, 
@@ -78,9 +81,9 @@ async def getSiteInfo(info: SiteInfo):
         # filter by name
         if info.businessName.strip().lower() in site['clntste_nme'].strip().lower() or site['clntste_nme'].strip().lower() in info.businessName.strip().lower():
             score += 20
-        # levenshteinDistance = distance(site['clntste_nme'].strip().lower(), info.businessName.strip().lower())
-        # score += 0 if levenshteinDistance >= 3 else 20 - levenshteinDistance
-        
+
+        levenshteinDistance = distance(site['clntste_nme'].strip().lower(), info.businessName.strip().lower())
+
         # ratio = SequenceMatcher(None, info.businessName.strip().lower(), site['clntste_name'].strip().lower()).ratio()
         # if ratio >= similarity_threshold:
         #     score += ratio * 20
@@ -90,7 +93,23 @@ async def getSiteInfo(info: SiteInfo):
         
         if score >= 20:
             sitesByZipNameEmailPhone.append(site)
-        
+        else:
+            if levenshteinDistance <= 5:
+                possibleSites.append(site)
+
+    for site in possibleSites:
+        siteLat, siteLng = get_lat_lng(
+            addressLine=[site['clntste_addrss_shp_addrss_strt']], 
+            city=site['clntste_addrss_shp_addrss_cty'], 
+            state=site['clntste_addrss_shp_addrss_stte'],
+            zip=site['clntste_addrss_shp_addrss_zp']
+        )
+        if siteLat != None and siteLng != None:
+            dist = haversine_distance([formLat, formLng], [siteLat, siteLng])
+            if dist < 0.1:
+                # possibleSitesDist.append(site)
+                sitesByZipNameEmailPhoneDist.append(site)
+
     # Filter by address (distance)
     for site in sitesByZipNameEmailPhone:
         siteLat, siteLng = get_lat_lng(
@@ -113,7 +132,55 @@ async def getSiteInfo(info: SiteInfo):
             # if dist <= 0.1:
             #     sitesByZipNameEmailPhoneDist.append(site)
 
+    # return sitesByZipNameEmailPhoneDist, possibleSitesDist
     return sitesByZipNameEmailPhoneDist
+
+# async def getPossibleSites(info: SiteInfo):
+#     sitesByZip = await clientAddressByZipUnique(info.zip)
+#     sitesByZipNameEmailPhone = []
+#     sitesByZipNameEmailPhoneDist = []
+#     formLat, formLng = get_lat_lng(
+#         addressLine=[info.street1], 
+#         city=info.city, 
+#         state=info.state,
+#         zip=info.zip
+#     )
+
+#     highestScore = 0
+
+#     for site in sitesByZip:
+#         score = 0
+#         if getIntFromStr(site['clntste_cntct1_cntct_phne']) in [getIntFromStr(phone) for phone in info.phoneNumbers] or getIntFromStr(site['clntste_cntct2_cntct_phne']) in [getIntFromStr(phone) for phone in info.phoneNumbers] or getIntFromStr(site['clntste_phne_vce']) in [getIntFromStr(phone) for phone in info.phoneNumbers]:
+#             score += 20
+#         if getDomainFromEmail(site['clntste_cntct1_cntct_eml']).strip().lower() in [getDomainFromEmail(email) for email in info.emails] or getDomainFromEmail(site['clntste_cntct2_cntct_eml']).strip().lower() in [getDomainFromEmail(email) for email in info.emails]:
+#             score += 20
+#         else:
+#             email_list = site['clntste_eml'].split(';')
+#             for email in email_list:
+#                 if getDomainFromEmail(email).strip().lower() in [getDomainFromEmail(email) for email in info.emails]:
+#                     score += 20
+
+#         levenshteinDistance = distance(site['clntste_nme'].strip().lower(), info.businessName.strip().lower())
+#         # if info.businessName.strip().lower() in site['clntste_nme'].strip().lower() or site['clntste_nme'].strip().lower() in info.businessName.strip().lower():
+#         #     score += 20
+#         score += 0 if levenshteinDistance >= 5 else 20 - levenshteinDistance
+#         if score > highestScore:
+#             highestScore = score
+#         if score >= 20:
+#             sitesByZipNameEmailPhone.append(site)
+
+#     for site in sitesByZipNameEmailPhone:
+#         siteLat, siteLng = get_lat_lng(
+#             addressLine=[site['clntste_addrss_shp_addrss_strt']], 
+#             city=site['clntste_addrss_shp_addrss_cty'], 
+#             state=site['clntste_addrss_shp_addrss_stte'],
+#             zip=site['clntste_addrss_shp_addrss_zp']
+#         )
+#         if siteLat != None and siteLng != None:
+#             dist = haversine_distance([formLat, formLng], [siteLat, siteLng])
+#             if dist < 0.1:
+#                 sitesByZipNameEmailPhoneDist.append(site)
+#     return sitesByZipNameEmailPhoneDist
 
 async def ticketSubmission(authToken: str, submittedData: dict):
     # return authToken['jwt']

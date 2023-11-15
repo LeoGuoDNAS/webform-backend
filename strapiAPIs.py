@@ -268,6 +268,7 @@ async def ticketSubmission(authToken: str, submittedData: dict):
     # formattedData['EquipmentRN'] = equipmentRn
     # formattedData['SiteID'] = siteId
     # formattedData['SiteRN'] = siteRn
+    formattedData['BusinessName'] = submittedData['Business_Name']
     formattedData['EquipmentName'] = submittedData['Equipment_Name']
     formattedData['EquipmentID'] = submittedData['Equipment_ID']
     formattedData['EquipmentRN'] = submittedData['Equipment_RN']
@@ -354,6 +355,7 @@ async def ticketSubmission(authToken: str, submittedData: dict):
                                                 + " -- Poc Phone Ext:" + formattedData['POCPhoneNumberExt']
                                                 + " -- Poc Phone Two:" + formattedData['POCPhoneTwo']
                                                 + " -- Poc Phone Two Ext:" + formattedData['POCPhoneTwoExt']
+                                                + " -- Business Name:" + formattedData['BusinessName']
                                                 + " -- Street 1:" + formattedData['StreetOne']
                                                 + " -- Street 2:" + formattedData['StreetTwo']
                                                 + " -- Street 3:" + formattedData['StreetThree']

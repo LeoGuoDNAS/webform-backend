@@ -22,6 +22,7 @@ async def sendMessage(data: dict):
                     "Here are the details:\n\n" +
                     
                     "Site Info:\n" +
+                    f"- Business Name: {data['BusinessName']}\n" +
                     f"- Site ID: {data['SiteID']}\n" +
                     f"- Street 1: {data['StreetOne']}\n" +
                     f"- Street 2: {data['StreetTwo']}\n" +
@@ -46,8 +47,8 @@ async def sendMessage(data: dict):
                     f"- ClientPO: {data['ClientPO']}\n" +
                     f"- Request Date: {data['RequestDate']}\n" + 
                     f"- Access Date: {data['AccessDate']}\n" +
-                    f"- Equipment Access Start: {data['EquipAccessStart']}\n" +
-                    f"- Equipment Access End: {data['EquipAccessEnd']}\n" +
+                    f"- Equipment Access Start Time: {data['EquipAccessStart']}\n" +
+                    f"- Equipment Access End Time: {data['EquipAccessEnd']}\n" +
                     f"- OT Approved: {data['OTApproved']}\n\n"
                     
                     # f"Zip: {data['Zip']}\n" +
@@ -56,14 +57,14 @@ async def sendMessage(data: dict):
                     "Equipment Info:\n" +
                     f"- Make: {data['Make']}\n" +
                     f"- Model: {data['Model']}\n" +
-                    f"- Equipment Qr Code: {data['EquipmentQrCode']}\n" +
+                    # f"- Equipment Qr Code: {data['EquipmentQrCode']}\n" +
                     f"- Under Warranty: {data['UnderWarranty']}\n" +
                     f"- Serial Number: {data['SerialNumber']}\n" +
                     f"- Equipment Name: {data['EquipmentName']}\n" +
                     f"- Equipment ID: {data['EquipmentID']}\n" +
                     # f"Equipment Type: {data['EquipmentType']}\n" +
                     f"- Equipment Serviced in last 30 days: {data['EquipmentServiced']}\n" +
-                    f"- Equipment Location: {data['EquipmentLocation']}\n\n" +
+                    f"- Equipment Location (in their property): {data['EquipmentLocation']}\n\n" +
 
                     "Best Regards,\n" + 
                     "Day & Nite Information Technology\n\n" +

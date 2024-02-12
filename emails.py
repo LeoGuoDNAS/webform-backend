@@ -3,8 +3,8 @@ import json
 import requests
 from auth import acquire_access_token_without_user
 
-email_address1 = 'lguo@wearetheone.com'
-email_address2 = 'achowdhury@wearetheone.com'
+email_address1 = 'it@wearetheone.com'
+email_address2 = 'allservice@wearetheone.com'
 user_id = '36d8ede0-773f-46b2-835d-c3988e9a39fe' # it
 
 async def sendMessage(data: dict):
